@@ -1,11 +1,16 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, nanoid } from "@reduxjs/toolkit";
 import { act } from "react-dom/test-utils";
 
 const initialState = [
-  { author: { handle: "spurdoman" }, time: new Date(), text: "benis :D:D:D" },
   {
     author: { handle: "spurdoman" },
-    time: new Date(),
+    time: new Date().toISOString(),
+    text: "benis :D:D:D",
+    id: nanoid()
+  },
+  {
+    author: { handle: "spurdoman" },
+    time: new Date().toISOString(),
     text: `Jugemu Jugemu (寿限無、寿限無)
   Gokō-no surikire (五劫の擦り切れ)
   Kaijarisuigyo-no (海砂利水魚の)
@@ -15,7 +20,8 @@ const initialState = [
   Paipopaipo Paipo-no-shūringan (パイポパイポ パイポのシューリンガン)
   Shūringan-no Gūrindai (シューリンガンのグーリンダイ)
   Gūrindai-no Ponpokopī-no Ponpokonā-no (グーリンダイのポンポコピーのポンポコナーの)
-  Chōkyūmei-no Chōsuke (長久命の長助)`
+  Chōkyūmei-no Chōsuke (長久命の長助)`,
+    id: nanoid()
   }
 ];
 
@@ -26,12 +32,16 @@ const postsSlice = createSlice({
     createSpam(state, action) {
       state.push({
         author: { handle: "spurdoman" },
-        time: new Date(),
-        text: "benis :D:D:D 2"
+        time: new Date().toISOString(),
+        text: "benis :D:D:D 2",
+        id: nanoid()
       });
+    },
+    createPost(state, action) {
+      state.push({ ...action.payload, id: nanoid() });
     }
   }
 });
 
-export const { createSpam } = postsSlice.actions;
+export const { createSpam, createPost } = postsSlice.actions;
 export default postsSlice.reducer;

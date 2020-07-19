@@ -10,7 +10,7 @@ function Post({ text, image, author = {}, time }) {
       <div className="header">
         <div className="profile_picture">{author.profile_picture}</div>
         <div className="handle">{author.handle}</div>
-        <div className="time">{time.toISOString()}</div>
+        <div className="time">{time}</div>
       </div>
       <div className="content">
         <div className="text_content">{text}</div>

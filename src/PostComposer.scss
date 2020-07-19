@@ -1,0 +1,18 @@
+.PostComposer {
+  border: 0.06125em solid #888;
+  padding: 0.25em;
+
+  display: flex;
+  flex-flow: column;
+
+  & > .buttons {
+    display: flex;
+
+    justify-content: flex-start;
+
+    & > *:last-child {
+      margin-right: 0;
+      margin-left: auto;
+    }
+  }
+}

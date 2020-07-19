@@ -9,7 +9,7 @@ function Feed() {
   return (
     <div className="Feed">
       {posts.map((post) => (
-        <Post {..._.pick(post, ["author", "time", "text"])} />
+        <Post {..._.pick(post, ["author", "time", "text"])} key={post.id} />
       ))}
     </div>
   );
