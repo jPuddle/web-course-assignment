@@ -1,0 +1,30 @@
+.Post {
+  border: 0.06125em solid #888;
+
+  padding: 0.25em;
+
+  & > .header {
+    display: flex;
+    & > * {
+      margin: 0.25em;
+    }
+
+    & > .handle {
+      font-weight: bold;
+    }
+
+    & > .time {
+      color: var(--text-color-secondary);
+    }
+  }
+
+  & > .content {
+    margin: 0.25em 1.5em;
+  }
+
+  & > .buttons {
+    display: flex;
+
+    justify-content: space-evenly;
+  }
+}
