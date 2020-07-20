@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import _ from "lodash";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import "./PostComposer.scss";
 import { createPost } from "./slices/posts/postsSlice";
 
