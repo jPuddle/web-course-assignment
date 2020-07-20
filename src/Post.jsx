@@ -22,6 +22,7 @@ function Post({ text, image, author = {}, time }) {
           Like
         </button>
         <button className="repost">Repost</button>
+        <button className="delete">Delete</button>
       </div>
     </div>
   );
