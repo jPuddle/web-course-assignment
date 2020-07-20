@@ -1,4 +1,5 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
+import _ from "lodash";
 
 const initialState = [
   {
@@ -38,9 +39,12 @@ const postsSlice = createSlice({
     },
     createPost(state, action) {
       state.push({ ...action.payload, id: nanoid() });
+    },
+    deletePost(state, action) {
+      _.remove(state, (post) => post.id === action.payload);
     }
   }
 });
 
-export const { createSpam, createPost } = postsSlice.actions;
+export const { createSpam, createPost, deletePost } = postsSlice.actions;
 export default postsSlice.reducer;

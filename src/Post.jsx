@@ -1,9 +1,9 @@
 import React from "react";
 import "./Post.scss";
-import { createSpam } from "./slices/posts/postsSlice";
+import { createSpam, deletePost } from "./slices/posts/postsSlice";
 import { useDispatch } from "react-redux";
 
-function Post({ text, image, author = {}, time }) {
+function Post({ text, image, author = {}, time, id }) {
   const dispatch = useDispatch();
   return (
     <div className="Post">
@@ -22,7 +22,9 @@ function Post({ text, image, author = {}, time }) {
           Like
         </button>
         <button className="repost">Repost</button>
-        <button className="delete">Delete</button>
+        <button className="delete" onClick={() => dispatch(deletePost(id))}>
+          Delete
+        </button>
       </div>
     </div>
   );
