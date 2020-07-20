@@ -21,9 +21,8 @@ function PostComposer() {
           onClick={() =>
             dispatch(
               createPost({
-                author: { handle: "spurdoman" },
                 time: new Date().toISOString(),
-                text
+                text,
               })
             )
           }
