@@ -27,6 +27,23 @@ async function generateToken(user) {
   );
 }
 
+const authenticated = express.Router();
+authenticated.use(async (req, res, next) => {
+  const token = req.cookies["token"];
+  if (!token) {
+    console.debug("no cookie");
+    return res.sendStatus(400);
+  }
+  try {
+    const decoded = await jwt.verify(token, jwtSecret);
+    req.userId = decoded.sub;
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(400);
+  }
+  return next();
+});
+
 const Post = new mongoose.model(
   "Post",
   new Schema({
@@ -47,13 +64,13 @@ app.get("/ping", (req, res) => {
   res.json({ pong: "pong" });
 });
 
-app.get("/feed", async (req, res) => {
+authenticated.get("/feed", async (req, res) => {
   res.json(await Post.find({}));
 });
 
-app.post("/feed", async (req, res) => {
+authenticated.post("/feed", async (req, res) => {
   try {
-    await Post.create({ ...req.body, time: new Date() });
+    await Post.create({ ...req.body, time: new Date(), author: req.userId });
   } catch (err) {
     console.error(err);
     return res.sendStatus(400);
@@ -61,10 +78,15 @@ app.post("/feed", async (req, res) => {
   return res.sendStatus(200);
 });
 
-app.delete("/post/:id", async (req, res) => {
+authenticated.delete("/post/:id", async (req, res) => {
   try {
     console.log(req.params);
-    await Post.findByIdAndDelete(req.params.id);
+    if (
+      (await Post.deleteOne({ _id: req.params.id, author: req.userId })
+        .deletedCount) < 1
+    ) {
+      return res.sendStatus(400);
+    }
   } catch (err) {
     console.error(err);
     return res.sendStatus(400);
