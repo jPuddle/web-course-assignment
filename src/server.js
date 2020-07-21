@@ -18,6 +18,13 @@ const Post = new mongoose.model(
   })
 );
 
+const User = new mongoose.model(
+  "User",
+  new Schema({
+    handle: String,
+  })
+);
+
 app.get("/ping", (req, res) => {
   res.json({ pong: "pong" });
 });
@@ -31,10 +38,9 @@ app.post("/feed", async (req, res) => {
     await Post.create({ ...req.body, time: new Date() });
   } catch (err) {
     console.error(err);
-    res.sendStatus(400);
-    return;
+    return res.sendStatus(400);
   }
-  res.sendStatus(200);
+  return res.sendStatus(200);
 });
 
 app.delete("/post/:id", async (req, res) => {
@@ -43,9 +49,24 @@ app.delete("/post/:id", async (req, res) => {
     await Post.findByIdAndDelete(req.params.id);
   } catch (err) {
     console.error(err);
-    res.sendStatus(400);
-    return;
+    return res.sendStatus(400);
   }
-  res.sendStatus(200);
+  return res.sendStatus(200);
 });
+
+app.post("/register", async (req, res) => {
+  const { handle } = req.body;
+  if (await User.exists({ handle })) {
+    return res.sendStatus(400);
+  }
+
+  try {
+    await User.create({ handle });
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(400);
+  }
+  return res.sendStatus(200);
+});
+
 app.listen(8080);
