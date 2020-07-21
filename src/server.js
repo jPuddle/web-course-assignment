@@ -4,7 +4,10 @@ app.use(express.json());
 
 const mongoose = require("mongoose");
 const { ObjectId, Schema } = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/microblog");
+mongoose.connect("mongodb://localhost:27017/microblog", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 const Post = new mongoose.model(
   "Post",
