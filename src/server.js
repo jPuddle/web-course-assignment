@@ -9,6 +9,24 @@ mongoose.connect("mongodb://localhost:27017/microblog", {
   useUnifiedTopology: true,
 });
 
+const cookies = require("cookie-parser");
+app.use(cookies());
+
+const jwt = require("jsonwebtoken");
+const jwtSecret = "ebin :D:D:D";
+
+async function generateToken(user) {
+  return await jwt.sign(
+    {
+      sub: user._id,
+    },
+    jwtSecret,
+    {
+      expiresIn: 24 * 60 * 60,
+    }
+  );
+}
+
 const Post = new mongoose.model(
   "Post",
   new Schema({
@@ -66,6 +84,21 @@ app.post("/register", async (req, res) => {
     console.error(err);
     return res.sendStatus(400);
   }
+  return res.sendStatus(200);
+});
+
+app.post("/login", async (req, res) => {
+  const { handle } = req.body;
+  const user = await User.findOne({ handle });
+  if (!user) {
+    return res.sendStatus(400);
+  }
+
+  const token = await generateToken(user);
+  res.cookie("token", token, {
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
   return res.sendStatus(200);
 });
 
