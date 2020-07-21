@@ -13,7 +13,7 @@ const Post = new mongoose.model(
   "Post",
   new Schema({
     text: String,
-    time: String,
+    time: Date,
     author: ObjectId,
   })
 );
@@ -28,7 +28,7 @@ app.get("/feed", async (req, res) => {
 
 app.post("/feed", async (req, res) => {
   try {
-    await Post.create(req.body);
+    await Post.create({ ...req.body, time: new Date() });
   } catch (err) {
     console.error(err);
     res.sendStatus(400);
@@ -37,4 +37,15 @@ app.post("/feed", async (req, res) => {
   res.sendStatus(200);
 });
 
+app.delete("/post/:id", async (req, res) => {
+  try {
+    console.log(req.params);
+    await Post.findByIdAndDelete(req.params.id);
+  } catch (err) {
+    console.error(err);
+    res.sendStatus(400);
+    return;
+  }
+  res.sendStatus(200);
+});
 app.listen(8080);
