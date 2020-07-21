@@ -18,14 +18,15 @@ function PostComposer() {
         <button className="image_button">Add image</button>
         <button
           className="send"
-          onClick={() =>
+          onClick={() => {
             dispatch(
               createPost({
                 time: new Date().toISOString(),
                 text,
               })
-            )
-          }
+            );
+            setText("");
+          }}
         >
           Send
         </button>
