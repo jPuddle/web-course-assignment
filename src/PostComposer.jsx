@@ -21,7 +21,6 @@ function PostComposer() {
           onClick={() => {
             dispatch(
               createPost({
-                time: new Date().toISOString(),
                 text,
               })
             );

@@ -64,7 +64,7 @@ app.get("/ping", (req, res) => {
   res.json({ pong: "pong" });
 });
 
-authenticated.get("/feed", async (req, res) => {
+app.get("/feed", async (req, res) => {
   res.json(await Post.find({}));
 });
 
@@ -82,8 +82,8 @@ authenticated.delete("/post/:id", async (req, res) => {
   try {
     console.log(req.params);
     if (
-      (await Post.deleteOne({ _id: req.params.id, author: req.userId })
-        .deletedCount) < 1
+      (await Post.deleteOne({ _id: req.params.id, author: req.userId }))
+        .deletedCount < 1
     ) {
       return res.sendStatus(400);
     }
@@ -123,5 +123,7 @@ app.post("/login", async (req, res) => {
 
   return res.sendStatus(200);
 });
+
+app.use(authenticated);
 
 app.listen(8080);

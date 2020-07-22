@@ -16,6 +16,9 @@ const postsSlice = createSlice({
         .get("/feed")
         .then((response) => store.dispatch(feedReceived(response.data)));
     },
+    login(state, action) {
+      axios.post("/login", action.payload);
+    },
     createPost(state, action) {
       axios
         .post("/feed", action.payload)
@@ -34,5 +37,6 @@ export const {
   refreshFeed,
   createPost,
   deletePost,
+  login,
 } = postsSlice.actions;
 export default postsSlice.reducer;
