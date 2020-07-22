@@ -49,7 +49,7 @@ const Post = new mongoose.model(
   new Schema({
     text: String,
     time: Date,
-    author: ObjectId,
+    author: { type: Schema.Types.ObjectId, ref: "User" },
   })
 );
 
@@ -57,6 +57,7 @@ const User = new mongoose.model(
   "User",
   new Schema({
     handle: String,
+    posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
   })
 );
 
@@ -65,7 +66,7 @@ app.get("/ping", (req, res) => {
 });
 
 app.get("/feed", async (req, res) => {
-  res.json(await Post.find({}));
+  res.json(await Post.find({}).populate("author"));
 });
 
 authenticated.post("/feed", async (req, res) => {
