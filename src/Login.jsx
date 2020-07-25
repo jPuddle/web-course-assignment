@@ -6,6 +6,7 @@ import { login } from "./slices/posts/userSlice";
 function Login() {
   const dispatch = useDispatch();
   const [handle, setHandle] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <div className="Login">
       <input
@@ -14,6 +15,12 @@ function Login() {
         value={handle}
         onChange={(e) => setHandle(e.target.value)}
       />
+      <input
+        className="password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <div className="buttons">
         <button
           className="loginbutton"
@@ -21,6 +28,7 @@ function Login() {
             dispatch(
               login({
                 handle,
+                password,
               })
             )
           }

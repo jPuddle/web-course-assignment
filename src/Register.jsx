@@ -6,6 +6,7 @@ import { register } from "./slices/posts/userSlice";
 function Register() {
   const dispatch = useDispatch();
   const [handle, setHandle] = useState("");
+  const [password, setPassword] = useState("");
   return (
     <div className="Register">
       <input
@@ -14,6 +15,12 @@ function Register() {
         value={handle}
         onChange={(e) => setHandle(e.target.value)}
       />
+      <input
+        className="password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
       <div className="buttons">
         <button
           className="registerbutton"
@@ -21,6 +28,7 @@ function Register() {
             dispatch(
               register({
                 handle,
+                password,
               })
             )
           }

@@ -12,8 +12,29 @@ mongoose.connect("mongodb://localhost:27017/microblog", {
 const cookies = require("cookie-parser");
 app.use(cookies());
 
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
 const jwt = require("jsonwebtoken");
 const jwtSecret = "ebin :D:D:D";
+
+const Post = new mongoose.model(
+  "Post",
+  new Schema({
+    text: String,
+    time: Date,
+    author: { type: Schema.Types.ObjectId, ref: "User" },
+  })
+);
+
+const User = new mongoose.model(
+  "User",
+  new Schema({
+    handle: String,
+    password: String,
+    posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+  })
+);
 
 async function generateToken(user) {
   return await jwt.sign(
@@ -44,23 +65,6 @@ authenticated.use(async (req, res, next) => {
   }
   return next();
 });
-
-const Post = new mongoose.model(
-  "Post",
-  new Schema({
-    text: String,
-    time: Date,
-    author: { type: Schema.Types.ObjectId, ref: "User" },
-  })
-);
-
-const User = new mongoose.model(
-  "User",
-  new Schema({
-    handle: String,
-    posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
-  })
-);
 
 app.get("/ping", (req, res) => {
   res.json({ pong: "pong" });
@@ -96,38 +100,53 @@ authenticated.delete("/post/:id", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { handle } = req.body;
+  const { handle, password } = req.body;
   if (await User.exists({ handle })) {
     return res.sendStatus(400);
   }
 
-  try {
-    await User.create({ handle });
-  } catch (err) {
-    console.error(err);
-    return res.sendStatus(400);
-  }
-  return res.sendStatus(200);
+  return bcrypt.hash(password, saltRounds, async (err, hash) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(400);
+    }
+    try {
+      await User.create({ handle, password: hash });
+    } catch (err) {
+      console.error(err);
+      return res.sendStatus(400);
+    }
+    return res.sendStatus(200);
+  });
 });
 
 app.post("/login", async (req, res) => {
-  const { handle } = req.body;
+  const { handle, password } = req.body;
   const user = await User.findOne({ handle });
   if (!user) {
     return res.sendStatus(400);
   }
 
-  const token = await generateToken(user);
-  const args = [
-    "token",
-    token,
-    {
-      maxAge: 24 * 60 * 60 * 1000,
-    },
-  ];
-  res.cookie(...args);
+  return bcrypt.compare(password, user.password, async (err, result) => {
+    if (err) {
+      return res.sendStatus(400);
+    }
+    if (!result) {
+      return res.sendStatus(400);
+    }
 
-  return res.json(args);
+    const token = await generateToken(user);
+    const args = [
+      "token",
+      token,
+      {
+        maxAge: 24 * 60 * 60 * 1000,
+      },
+    ];
+    res.cookie(...args);
+
+    return res.json(args);
+  });
 });
 
 app.use(authenticated);
