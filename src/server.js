@@ -73,11 +73,13 @@ app.get("/ping", (req, res) => {
 app.get("/feed/:id", async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
 
-  res.json(await Post.find({ author: user._id }).populate("author"));
+  res.json(
+    await Post.find({ author: user._id }).populate("author", "-password")
+  );
 });
 
 app.get("/feed", async (req, res) => {
-  res.json(await Post.find({}).populate("author"));
+  res.json(await Post.find({}).populate("author", "-password"));
 });
 
 authenticated.post("/feed", async (req, res) => {
