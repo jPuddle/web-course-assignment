@@ -10,7 +10,7 @@ function Login() {
   return (
     <div className="Login">
       <input
-        className="handlebox"
+        className="handle"
         type="text"
         value={handle}
         onChange={(e) => setHandle(e.target.value)}

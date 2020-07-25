@@ -13,7 +13,7 @@ const postsSlice = createSlice({
     },
     refreshFeed(state, action) {
       axios
-        .get("/feed")
+        .get(action.payload ? "/feed/" + action.payload : "/feed")
         .then((response) => store.dispatch(feedReceived(response.data)));
     },
     createPost(state, action) {

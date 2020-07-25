@@ -20,7 +20,6 @@ function Post({ text, image, author, time, _id }) {
       )}
     </div>
   ) : null;
-  console.log({ author, user });
   return (
     <div className="Post">
       <div className="header">

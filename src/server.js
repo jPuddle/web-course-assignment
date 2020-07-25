@@ -32,7 +32,7 @@ const User = new mongoose.model(
   new Schema({
     handle: String,
     password: String,
-    posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+    // posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
   })
 );
 
@@ -68,6 +68,12 @@ authenticated.use(async (req, res, next) => {
 
 app.get("/ping", (req, res) => {
   res.json({ pong: "pong" });
+});
+
+app.get("/feed/:id", async (req, res) => {
+  const user = await User.findOne({ _id: req.params.id });
+
+  res.json(await Post.find({ author: user._id }).populate("author"));
 });
 
 app.get("/feed", async (req, res) => {

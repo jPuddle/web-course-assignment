@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import "./Register.scss";
 import { register } from "./slices/posts/userSlice";
+import { Link } from "react-router-dom";
 
 function Register() {
   const dispatch = useDispatch();
@@ -10,7 +11,7 @@ function Register() {
   return (
     <div className="Register">
       <input
-        className="handlebox"
+        className="handle"
         type="text"
         value={handle}
         onChange={(e) => setHandle(e.target.value)}
@@ -36,6 +37,7 @@ function Register() {
           Register
         </button>
       </div>
+      <Link to="/">Go back</Link>
     </div>
   );
 }
