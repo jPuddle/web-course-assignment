@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import "./Register.scss";
-import { register } from "./slices/posts/postsSlice";
+import { register } from "./slices/posts/userSlice";
 
 function Register() {
   const dispatch = useDispatch();

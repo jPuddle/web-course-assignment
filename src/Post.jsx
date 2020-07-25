@@ -1,10 +1,26 @@
 import React from "react";
 import "./Post.scss";
 import { deletePost } from "./slices/posts/postsSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-function Post({ text, image, author = {}, time, _id }) {
+function Post({ text, image, author, time, _id }) {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const loggedIn = !!user;
+  const buttons = loggedIn ? (
+    <div className="buttons">
+      <button className="reply">Reply</button>
+      <button className="like">Like</button>
+      {author._id === user.sub ? (
+        <button className="delete" onClick={() => dispatch(deletePost(_id))}>
+          Delete
+        </button>
+      ) : (
+        <button className="repost">Repost</button>
+      )}
+    </div>
+  ) : null;
+  console.log({ author, user });
   return (
     <div className="Post">
       <div className="header">
@@ -16,14 +32,7 @@ function Post({ text, image, author = {}, time, _id }) {
         <div className="text_content">{text}</div>
         <div className="image_content">{image}</div>
       </div>
-      <div className="buttons">
-        <button className="reply">Reply</button>
-        <button className="like">Like</button>
-        <button className="repost">Repost</button>
-        <button className="delete" onClick={() => dispatch(deletePost(_id))}>
-          Delete
-        </button>
-      </div>
+      {buttons}
     </div>
   );
 }

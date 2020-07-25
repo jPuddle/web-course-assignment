@@ -7,23 +7,24 @@ import PostComposer from "./PostComposer";
 import Login from "./Login";
 import Axios from "axios";
 import { feedReceived } from "./slices/posts/postsSlice";
+import { init, logout } from "./slices/posts/userSlice";
 import Register from "./Register";
 import { Link, Route, Switch, BrowserRouter as Router } from "react-router-dom";
-import { CookiesProvider, useCookies, Cookies } from "react-cookie";
-import jwt_decode from "jwt-decode";
+import { CookiesProvider, Cookies } from "react-cookie";
+import { useSelector } from "react-redux";
 
 export const globalCookies = new Cookies();
 
 function App() {
   useEffect(() => {
+    store.dispatch(init());
     Axios.get("/feed").then((response) =>
       store.dispatch(feedReceived(response.data))
     );
   }, []);
 
-  const [cookies, , removeCookie] = useCookies(["token"]);
-  const decoded = cookies.token ? jwt_decode(cookies.token) : null;
-  const loggedIn = !!cookies.token;
+  const decoded = useSelector((state) => state.user);
+  const loggedIn = !!decoded;
   return (
     <div className="App">
       <Switch>
@@ -39,7 +40,7 @@ function App() {
                   <button
                     className="logout"
                     onClick={() => {
-                      removeCookie("token");
+                      store.dispatch(logout());
                     }}
                   >
                     Log out
