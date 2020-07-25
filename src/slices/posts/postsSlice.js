@@ -23,7 +23,9 @@ const postsSlice = createSlice({
       });
     },
     register(state, action) {
-      axios.post("/register", action.payload);
+      axios.post("/register", action.payload).then((response) => {
+        window.location = "/";
+      });
     },
     createPost(state, action) {
       axios

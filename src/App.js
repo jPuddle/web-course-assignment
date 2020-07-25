@@ -23,43 +23,43 @@ function App() {
 
   const [cookies, , removeCookie] = useCookies(["token"]);
   const decoded = cookies.token ? jwt_decode(cookies.token) : null;
+  const loggedIn = !!cookies.token;
   return (
     <div className="App">
-      <div className="container">
-        <div className="column navigation">
-          {cookies.token ? (
-            <>
-              <p> Logged in as {decoded.handle} </p>
-              <button
-                className="logout"
-                onClick={() => {
-                  removeCookie("token");
-                }}
-              >
-                Log out
-              </button>
-            </>
-          ) : (
-            <Switch>
-              <Route path="/login">
-                <Login />
-              </Route>
-              <Route path="/register">
-                <Register />
-              </Route>
-              <Route path="/">
-                <Link to="/login">Log in</Link>
-                <Link to="/register">Sign up</Link>
-              </Route>
-            </Switch>
-          )}
-        </div>
-        <div className="column content">
-          <PostComposer />
-          <Feed />
-        </div>
-        <div className="column search">Search</div>
-      </div>
+      <Switch>
+        <Route path="/register">
+          <Register />
+        </Route>
+        <Route>
+          <div className="container">
+            <div className="column navigation">
+              {loggedIn ? (
+                <>
+                  <p> Logged in as {decoded.handle} </p>
+                  <button
+                    className="logout"
+                    onClick={() => {
+                      removeCookie("token");
+                    }}
+                  >
+                    Log out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Login />
+                  <Link to="/register">Sign up</Link>
+                </>
+              )}
+            </div>
+            <div className="column content">
+              {loggedIn && <PostComposer />}
+              <Feed />
+            </div>
+            <div className="column search">Search</div>
+          </div>
+        </Route>
+      </Switch>
     </div>
   );
 }
