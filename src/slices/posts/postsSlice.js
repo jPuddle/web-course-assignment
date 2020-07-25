@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import store from "../../store.js";
+import { globalCookies } from "../../App";
 
 const initialState = [];
 
@@ -17,7 +18,12 @@ const postsSlice = createSlice({
         .then((response) => store.dispatch(feedReceived(response.data)));
     },
     login(state, action) {
-      axios.post("/login", action.payload);
+      axios.post("/login", action.payload).then((response) => {
+        globalCookies.set(...response.data);
+      });
+    },
+    register(state, action) {
+      axios.post("/register", action.payload);
     },
     createPost(state, action) {
       axios
@@ -38,5 +44,6 @@ export const {
   createPost,
   deletePost,
   login,
+  register,
 } = postsSlice.actions;
 export default postsSlice.reducer;

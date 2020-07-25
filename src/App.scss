@@ -5,8 +5,9 @@
   & > .container {
     display: flex;
     max-width: 1000px;
+    flex-grow: 1;
 
-    & > .column {
+    & > .content {
       flex-grow: 1;
     }
 

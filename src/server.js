@@ -3,7 +3,7 @@ const app = express();
 app.use(express.json());
 
 const mongoose = require("mongoose");
-const { ObjectId, Schema } = require("mongoose");
+const { Schema } = require("mongoose");
 mongoose.connect("mongodb://localhost:27017/microblog", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -19,6 +19,7 @@ async function generateToken(user) {
   return await jwt.sign(
     {
       sub: user._id,
+      handle: user.handle,
     },
     jwtSecret,
     {
@@ -81,7 +82,6 @@ authenticated.post("/feed", async (req, res) => {
 
 authenticated.delete("/post/:id", async (req, res) => {
   try {
-    console.log(req.params);
     if (
       (await Post.deleteOne({ _id: req.params.id, author: req.userId }))
         .deletedCount < 1
@@ -118,11 +118,16 @@ app.post("/login", async (req, res) => {
   }
 
   const token = await generateToken(user);
-  res.cookie("token", token, {
-    maxAge: 24 * 60 * 60 * 1000,
-  });
+  const args = [
+    "token",
+    token,
+    {
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  ];
+  res.cookie(...args);
 
-  return res.sendStatus(200);
+  return res.json(args);
 });
 
 app.use(authenticated);
