@@ -31,8 +31,7 @@ const User = new mongoose.model(
   "User",
   new Schema({
     handle: String,
-    password: String,
-    // posts: [{ type: Schema.Types.ObjectId, ref: "Post" }],
+    password: { type: String, select: false },
   })
 );
 
@@ -73,13 +72,11 @@ app.get("/ping", (req, res) => {
 app.get("/feed/:id", async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
 
-  res.json(
-    await Post.find({ author: user._id }).populate("author", "-password")
-  );
+  res.json(await Post.find({ author: user._id }).populate("author"));
 });
 
 app.get("/feed", async (req, res) => {
-  res.json(await Post.find({}).populate("author", "-password"));
+  res.json(await Post.find({}).populate("author"));
 });
 
 authenticated.post("/feed", async (req, res) => {
@@ -113,50 +110,44 @@ app.post("/register", async (req, res) => {
     return res.sendStatus(400);
   }
 
-  return bcrypt.hash(password, saltRounds, async (err, hash) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(400);
-    }
-    try {
-      await User.create({ handle, password: hash });
-    } catch (err) {
-      console.error(err);
-      return res.sendStatus(400);
-    }
-    return res.sendStatus(200);
-  });
+  const hash = await bcrypt.hash(password, saltRounds);
+  try {
+    await User.create({ handle, password: hash });
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(400);
+  }
+  return res.sendStatus(200);
 });
 
 app.post("/login", async (req, res) => {
   const { handle, password } = req.body;
-  const user = await User.findOne({ handle });
+  const user = await User.findOne({ handle }).select("+password");
   if (!user) {
     return res.sendStatus(400);
   }
 
-  return bcrypt.compare(password, user.password, async (err, result) => {
-    if (err) {
-      return res.sendStatus(400);
-    }
-    if (!result) {
-      return res.sendStatus(400);
-    }
+  const passwordMatch = await bcrypt.compare(password, user.password);
 
-    const token = await generateToken(user);
-    const args = [
-      "token",
-      token,
-      {
-        maxAge: 24 * 60 * 60 * 1000,
-      },
-    ];
-    res.cookie(...args);
+  if (!passwordMatch) {
+    return res.sendStatus(400);
+  }
 
-    return res.json(args);
-  });
+  const token = await generateToken(user);
+  const args = [
+    "token",
+    token,
+    {
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  ];
+  res.cookie(...args);
+
+  return res.json(args);
 });
 
 app.use(authenticated);
+
+app.use(express.static("build"));
 
 app.listen(8080);
