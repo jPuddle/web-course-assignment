@@ -4,10 +4,13 @@ app.use(express.json());
 
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
-mongoose.connect("mongodb://localhost:27017/microblog", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  process.env.MONGO_URL || "mongodb://localhost:27017/microblog",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 const cookies = require("cookie-parser");
 app.use(cookies());
@@ -146,8 +149,8 @@ app.post("/login", async (req, res) => {
   return res.json(args);
 });
 
-app.use(authenticated);
-
 app.use(express.static("build"));
+
+app.use(authenticated);
 
 app.listen(8080);
