@@ -6,8 +6,7 @@ const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
 
 // Reading env variables (config example from https://github.com/sclorg/nodejs-ex/blob/master/server.js)
-var mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
-  mongoURLLabel = "";
+var mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL;
 
 // For local dev
 // var mongoURL = 'mongodb://localhost:27017/demodb';
@@ -39,12 +38,11 @@ if (mongoURL == null) {
   }
 
   if (mongoHost && mongoPort && mongoDatabase) {
-    mongoURLLabel = mongoURL = "mongodb://";
+    mongoURL = "mongodb://";
     if (mongoUser && mongoPassword) {
       mongoURL += mongoUser + ":" + mongoPassword + "@";
     }
     // Provide UI label that excludes user id and pw
-    mongoURLLabel += mongoHost + ":" + mongoPort + "/" + mongoDatabase;
     mongoURL += mongoHost + ":" + mongoPort + "/" + mongoDatabase;
   }
 }
