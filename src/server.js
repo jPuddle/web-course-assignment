@@ -4,12 +4,13 @@ app.use(express.json());
 
 const mongoose = require("mongoose");
 const { Schema } = require("mongoose");
+const path = require("path");
 
 // Reading env variables (config example from https://github.com/sclorg/nodejs-ex/blob/master/server.js)
 var mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL;
 
 // For local dev
-// var mongoURL = 'mongodb://localhost:27017/demodb';
+// var mongoURL = "mongodb://localhost:27017/microblog";
 
 if (mongoURL == null) {
   var mongoHost, mongoPort, mongoDatabase, mongoPassword, mongoUser;
@@ -60,7 +61,7 @@ const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 const jwt = require("jsonwebtoken");
-const jwtSecret = "ebin :D:D:D";
+const jwtSecret = process.env.JWT_SECRET || "ebin :D:D:D";
 
 const Post = new mongoose.model(
   "Post",
@@ -96,30 +97,27 @@ const authenticated = express.Router();
 authenticated.use(async (req, res, next) => {
   const token = req.cookies["token"];
   if (!token) {
-    console.debug("no cookie");
-    return res.sendStatus(400);
+    return res.status(401).json({ message: "Cookie authentication failed." });
   }
   try {
     const decoded = await jwt.verify(token, jwtSecret);
     req.userId = decoded.sub;
   } catch (err) {
     console.error(err);
-    return res.sendStatus(400);
+    return res.status(401).json({ message: "Cookie authentication failed." });
   }
   return next();
 });
 
-app.get("/ping", (req, res) => {
-  res.json({ pong: "pong" });
-});
+const api = express.Router();
 
-app.get("/feed/:id", async (req, res) => {
+api.get("/feed/:id", async (req, res) => {
   const user = await User.findOne({ _id: req.params.id });
 
   res.json(await Post.find({ author: user._id }).populate("author"));
 });
 
-app.get("/feed", async (req, res) => {
+api.get("/feed", async (req, res) => {
   res.json(await Post.find({}).populate("author"));
 });
 
@@ -128,7 +126,7 @@ authenticated.post("/feed", async (req, res) => {
     await Post.create({ ...req.body, time: new Date(), author: req.userId });
   } catch (err) {
     console.error(err);
-    return res.sendStatus(400);
+    return res.status(500).json({ message: "Error saving post." });
   }
   return res.sendStatus(200);
 });
@@ -139,19 +137,21 @@ authenticated.delete("/post/:id", async (req, res) => {
       (await Post.deleteOne({ _id: req.params.id, author: req.userId }))
         .deletedCount < 1
     ) {
-      return res.sendStatus(400);
+      return res.status(400).json({
+        message: "Could not delete post. (No such post or not authorized)",
+      });
     }
   } catch (err) {
     console.error(err);
-    return res.sendStatus(400);
+    return res.status(500).json({ message: "Error deleting post." });
   }
   return res.sendStatus(200);
 });
 
-app.post("/register", async (req, res) => {
+api.post("/register", async (req, res) => {
   const { handle, password } = req.body;
   if (await User.exists({ handle })) {
-    return res.sendStatus(400);
+    return res.status(400).json({ message: "User already exists." });
   }
 
   const hash = await bcrypt.hash(password, saltRounds);
@@ -159,22 +159,22 @@ app.post("/register", async (req, res) => {
     await User.create({ handle, password: hash });
   } catch (err) {
     console.error(err);
-    return res.sendStatus(400);
+    return res.status(500).json({ message: "Error creating user." });
   }
   return res.sendStatus(200);
 });
 
-app.post("/login", async (req, res) => {
+api.post("/login", async (req, res) => {
   const { handle, password } = req.body;
   const user = await User.findOne({ handle }).select("+password");
   if (!user) {
-    return res.sendStatus(400);
+    return res.status(400).json({ message: "User does not exist." });
   }
 
   const passwordMatch = await bcrypt.compare(password, user.password);
 
   if (!passwordMatch) {
-    return res.sendStatus(400);
+    return res.status(400).json({ message: "Incorrect password." });
   }
 
   const token = await generateToken(user);
@@ -192,6 +192,11 @@ app.post("/login", async (req, res) => {
 
 app.use(express.static("build"));
 
-app.use(authenticated);
+app.use("/api/auth", authenticated);
+app.use("/api", api);
+
+app.use((req, res) => {
+  res.sendFile("/index.html", { root: path.join(__dirname, "../build") });
+});
 
 app.listen(8080);

@@ -1,6 +1,6 @@
 import React from "react";
 import "./Post.scss";
-import { deletePost } from "./slices/posts/postsSlice";
+import { deletePost } from "./slices/postsSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 function Post({ text, image, author, time, _id }) {
@@ -9,14 +9,10 @@ function Post({ text, image, author, time, _id }) {
   const loggedIn = !!user;
   const buttons = loggedIn ? (
     <div className="buttons">
-      <button className="reply">Reply</button>
-      <button className="like">Like</button>
-      {author._id === user.sub ? (
+      {author._id === user.sub && (
         <button className="delete" onClick={() => dispatch(deletePost(_id))}>
           Delete
         </button>
-      ) : (
-        <button className="repost">Repost</button>
       )}
     </div>
   ) : null;

@@ -1,8 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { globalCookies } from "../../App";
-import store from "../../store.js";
+import { cookies } from "../App";
+import store from "../store.js";
 
 const initialState = null;
 
@@ -11,27 +11,27 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     init(state, action) {
-      const token = globalCookies.get("token");
+      const token = cookies.get("token");
       if (!token) return null;
       else return jwt_decode(token);
     },
     login(state, action) {
       console.log(action.payload);
-      axios.post("/login", action.payload).then((response) => {
+      axios.post("/api/login", action.payload).then((response) => {
         store.dispatch(loginSuccess(response.data));
       });
       return state;
     },
     loginSuccess(state, action) {
-      globalCookies.set(...action.payload);
+      cookies.set(...action.payload);
       return jwt_decode(action.payload[1]);
     },
     logout(state, action) {
-      globalCookies.remove("token");
+      cookies.remove("token");
       return null;
     },
     register(state, action) {
-      axios.post("/register", action.payload).then((response) => {
+      axios.post("/api/register", action.payload).then((response) => {
         window.location = "/";
       });
       return state;

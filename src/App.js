@@ -6,19 +6,19 @@ import Feed from "./Feed";
 import PostComposer from "./PostComposer";
 import Login from "./Login";
 import Axios from "axios";
-import { feedReceived } from "./slices/posts/postsSlice";
-import { init, logout } from "./slices/posts/userSlice";
+import { feedReceived } from "./slices/postsSlice";
+import { init, logout } from "./slices/userSlice";
 import Register from "./Register";
 import { Link, Route, Switch, BrowserRouter as Router } from "react-router-dom";
 import { CookiesProvider, Cookies } from "react-cookie";
 import { useSelector } from "react-redux";
 
-export const globalCookies = new Cookies();
+export const cookies = new Cookies();
 
 function App() {
   useEffect(() => {
     store.dispatch(init());
-    Axios.get("/feed").then((response) =>
+    Axios.get("/api/feed").then((response) =>
       store.dispatch(feedReceived(response.data))
     );
   }, []);
@@ -57,7 +57,7 @@ function App() {
               {loggedIn && <PostComposer />}
               <Feed />
             </div>
-            <div className="column search">Search</div>
+            <div className="column filler" />
           </div>
         </Route>
       </Switch>
@@ -67,7 +67,7 @@ function App() {
 
 function AppWrapper() {
   return (
-    <CookiesProvider cookies={globalCookies}>
+    <CookiesProvider cookies={cookies}>
       <Provider store={store}>
         <Router>
           <App />

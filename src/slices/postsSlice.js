@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import store from "../../store.js";
+import store from "../store.js";
 
 const initialState = [];
 
@@ -13,17 +13,17 @@ const postsSlice = createSlice({
     },
     refreshFeed(state, action) {
       axios
-        .get(action.payload ? "/feed/" + action.payload : "/feed")
+        .get("/api/feed")
         .then((response) => store.dispatch(feedReceived(response.data)));
     },
     createPost(state, action) {
       axios
-        .post("/feed", action.payload)
+        .post("/api/auth/feed", action.payload)
         .then((response) => store.dispatch(refreshFeed()));
     },
     deletePost(state, action) {
       axios
-        .delete(`/post/${action.payload}`)
+        .delete("/api/auth/post/" + action.payload)
         .then((response) => store.dispatch(refreshFeed()));
     },
   },

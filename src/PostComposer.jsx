@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import "./PostComposer.scss";
-import { createPost } from "./slices/posts/postsSlice";
+import { createPost } from "./slices/postsSlice";
 
 function PostComposer() {
   const dispatch = useDispatch();
@@ -15,7 +15,6 @@ function PostComposer() {
         onChange={(e) => setText(e.target.value)}
       />
       <div className="buttons">
-        <button className="image_button">Add image</button>
         <button
           className="send"
           onClick={() => {
