@@ -6,22 +6,19 @@ import Feed from "./Feed";
 import PostComposer from "./PostComposer";
 import Login from "./Login";
 import Notifications from "./Notifications";
-import Axios from "axios";
-import { feedReceived } from "./slices/postsSlice";
 import { init, logout } from "./slices/userSlice";
 import Register from "./Register";
 import { Link, Route, Switch, BrowserRouter as Router } from "react-router-dom";
 import { CookiesProvider, Cookies } from "react-cookie";
 import { useSelector } from "react-redux";
+import { refreshFeed } from "./slices/postsSlice";
 
 export const cookies = new Cookies();
 
 function App() {
   useEffect(() => {
     store.dispatch(init());
-    Axios.get("/api/feed").then((response) =>
-      store.dispatch(feedReceived(response.data))
-    );
+    store.dispatch(refreshFeed());
   }, []);
 
   const decoded = useSelector((state) => state.user);
@@ -51,7 +48,9 @@ function App() {
               ) : (
                 <>
                   <Login />
-                  <Link to="/register">Sign up</Link>
+                  <Link to="/register">
+                    <button>Sign up</button>
+                  </Link>
                 </>
               )}
             </div>

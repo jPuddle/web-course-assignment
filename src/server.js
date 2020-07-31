@@ -7,10 +7,8 @@ const { Schema } = require("mongoose");
 const path = require("path");
 
 // Reading env variables (config example from https://github.com/sclorg/nodejs-ex/blob/master/server.js)
+// In local dev environment, you need to export MONGO_URL=mongodb://localhost:27017/microblog or similar
 var mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL;
-
-// For local dev
-// var mongoURL = "mongodb://localhost:27017/microblog";
 
 if (mongoURL == null) {
   var mongoHost, mongoPort, mongoDatabase, mongoPassword, mongoUser;
@@ -66,7 +64,7 @@ const jwtSecret = process.env.JWT_SECRET || "ebin :D:D:D";
 const Post = new mongoose.model(
   "Post",
   new Schema({
-    text: String,
+    text: { type: String, minlength: 1, maxlength: 512, trim: true },
     time: Date,
     author: { type: Schema.Types.ObjectId, ref: "User" },
   })
@@ -75,7 +73,14 @@ const Post = new mongoose.model(
 const User = new mongoose.model(
   "User",
   new Schema({
-    handle: String,
+    handle: {
+      type: String,
+      trim: true,
+      match: /^[a-z0-9][a-z0-9_-]*$/,
+      minlength: 1,
+      maxlength: 16,
+      lowercase: true,
+    },
     password: { type: String, select: false },
   })
 );
@@ -151,7 +156,7 @@ authenticated.delete("/post/:id", async (req, res) => {
 api.post("/register", async (req, res) => {
   const { handle, password } = req.body;
   if (await User.exists({ handle })) {
-    return res.status(400).json({ message: "User already exists." });
+    return res.status(400).json({ message: "Username is taken." });
   }
 
   const hash = await bcrypt.hash(password, saltRounds);
