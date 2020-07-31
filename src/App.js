@@ -5,6 +5,7 @@ import store from "./store.js";
 import Feed from "./Feed";
 import PostComposer from "./PostComposer";
 import Login from "./Login";
+import Notifications from "./Notifications";
 import Axios from "axios";
 import { feedReceived } from "./slices/postsSlice";
 import { init, logout } from "./slices/userSlice";
@@ -27,6 +28,7 @@ function App() {
   const loggedIn = !!decoded;
   return (
     <div className="App">
+      <Notifications />
       <Switch>
         <Route path="/register">
           <Register />

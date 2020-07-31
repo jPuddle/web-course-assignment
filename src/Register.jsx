@@ -10,19 +10,23 @@ function Register() {
   const [password, setPassword] = useState("");
   return (
     <div className="Register">
-      <input
-        className="handle"
-        type="text"
-        value={handle}
-        onChange={(e) => setHandle(e.target.value)}
-      />
-      <input
-        className="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <div className="buttons">
+      <div className="container">
+        Handle:
+        <input
+          className="handle"
+          type="text"
+          value={handle}
+          onChange={(e) => setHandle(e.target.value)}
+        />
+        <br />
+        Password:
+        <input
+          className="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <br />
         <button
           className="registerbutton"
           onClick={() =>
@@ -37,7 +41,17 @@ function Register() {
           Register
         </button>
       </div>
-      <Link to="/">Go back</Link>
+      <p>
+        Handle must be 1-16 characters long.
+        <br />
+        Handle may contain letters (a-z, case-insensitive), numbers (0-9),
+        underscores (_) and dashes (-).
+        <br />
+        Handle must start with a letter.
+      </p>
+      <Link to="/">
+        <button>Go back</button>
+      </Link>
     </div>
   );
 }

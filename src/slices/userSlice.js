@@ -3,6 +3,7 @@ import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { cookies } from "../App";
 import store from "../store.js";
+import { createNotification } from "./notificationsSlice";
 
 const initialState = null;
 
@@ -16,10 +17,14 @@ const userSlice = createSlice({
       else return jwt_decode(token);
     },
     login(state, action) {
-      console.log(action.payload);
-      axios.post("/api/login", action.payload).then((response) => {
-        store.dispatch(loginSuccess(response.data));
-      });
+      axios
+        .post("/api/login", action.payload)
+        .then((response) => {
+          store.dispatch(loginSuccess(response.data));
+        })
+        .catch((reason) =>
+          store.dispatch(createNotification(reason.response.data))
+        );
       return state;
     },
     loginSuccess(state, action) {
@@ -31,9 +36,14 @@ const userSlice = createSlice({
       return null;
     },
     register(state, action) {
-      axios.post("/api/register", action.payload).then((response) => {
-        window.location = "/";
-      });
+      axios
+        .post("/api/register", action.payload)
+        .then((response) => {
+          window.location = "/";
+        })
+        .catch((reason) =>
+          store.dispatch(createNotification(reason.response.data))
+        );
       return state;
     },
   },

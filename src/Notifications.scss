@@ -1,0 +1,15 @@
+.Notifications {
+  display: flex;
+  flex-direction: column;
+
+  & > .notification {
+    border: 0.06125em solid #888;
+    background-color: #a55;
+    flex-grow: 1;
+    padding-left: 3em;
+  }
+
+  & button {
+    background-color: red;
+  }
+}
